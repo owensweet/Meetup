@@ -24,6 +24,7 @@ async function initMap() {
         tilt: 45,
         mapId: "90f87356969d889c",
         disableDefaultUI: true,
+        gestureHandling: "greedy",
     });
     google.maps.event.addListenerOnce(map, 'idle', function() {
         map.setTilt(45);
