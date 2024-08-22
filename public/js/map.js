@@ -1,15 +1,11 @@
 function updateMarkerRotation(position) {
-    if (position.coords.speed > 0) {
-      console.log('You are moving!');
-      const heading = position.coords.heading; // Get the direction of movement in degrees
+      let heading = position.coords.heading; // Get the direction of movement in degrees
       if (typeof heading === 'number') {
         const userMarker = map.getMarkers().find(marker => marker.getTitle() === 'Your Location'); // Find the user marker
         if (userMarker) {
             userMarker.setRotation(heading); // Set rotation angle to movement direction
         } 
       }
-      
-    }
 }
 
 let map;
@@ -55,7 +51,29 @@ async function initMap() {
             });
             map.setCenter(user1Marker.position);
             map.setTilt(75);
-            navigator.geolocation.watchPosition(updateMarkerRotation);
+
+            //watchposition function with extra parameters
+            function success(position) {
+              console.log("Success: location watchposition changed");
+              user1Marker.position = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+              updateMarkerRotation(position);
+            }
+            
+            function error() {
+              alert("Sorry, no position available.");
+            }
+            
+            const options = {
+              enableHighAccuracy: true,
+              maximumAge: 30000,
+              timeout: 27000,
+            };
+            
+            const watchID = navigator.geolocation.watchPosition(success, error, options);
+            
           },
           () => {
             handleLocationError(true, map.getCenter());
@@ -80,4 +98,4 @@ function loadGoogleMaps() {
 }
 
 
-document.addEventListener("DOMContentLoaded", loadGoogleMaps);
+document.addEventListener("DOMContentLoaded", loadGoogleMaps);  
