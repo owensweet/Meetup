@@ -18,10 +18,11 @@ app.get('/', (req, res) => {
     res.render("map", {apiKey: MAPSAPIKEY});
 });
 
+//currently unused route for fetching apikey
 app.get('/mapsApiKey', (req, res) => {
 
     res.json({ apiKey: MAPSAPIKEY });
-})
+});
 
 
 
