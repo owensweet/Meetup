@@ -1,20 +1,19 @@
 function updateMarkerRotation(position) {
-      let heading = position.coords.heading; // Get the direction of movement in degrees
+    //heading could be null on some devices (or all)
+      let heading = position.coords.heading; 
       if (typeof heading === 'number') {
-        const userMarker = map.getMarkers().find(marker => marker.getTitle() === 'Your Location'); // Find the user marker
-        if (userMarker) {
-            userMarker.setRotation(heading); // Set rotation angle to movement direction
-        } 
+          //new google map markers need to be styled instead of using setRotation()
+          user1Marker.content.style.transform = `rotate(${heading}deg)`; 
       }
 }
 
 let map;
 
-async function initMap() {
+window.initMap = async function() {
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-   map = new google.maps.Map(document.getElementById("map"), {
+   map = new Map(document.getElementById("map"), {
         center: {lat: 49.222177, lng: -122.686493},
         zoom: 16.5,
         tilt: 45,
@@ -23,7 +22,7 @@ async function initMap() {
         gestureHandling: "greedy",
     });
     google.maps.event.addListenerOnce(map, 'idle', function() {
-        map.setTilt(45);
+        map.setTilt(90);
     });
 
     // Try HTML5 geolocation.
@@ -35,32 +34,31 @@ async function initMap() {
               lng: position.coords.longitude,
             };
 
-            const user1Marker = new google.maps.Marker({
-                map: map,
-                enableHighAccuracy: true,
-                position: pos,
-                title: 'Your Location',
-                icon: {
-                    url: '/images/pointer.png',
-                    size: new google.maps.Size(50, 50),
-                    scaledSize: new google.maps.Size(50, 50),
-                    anchor: new google.maps.Point(25, 25),
-                    tilt: 45,
-
-                }
+            const user1Marker = new AdvancedMarkerElement({
+              map,
+              position: pos,
+              title: 'Your Location',
+              content: document.createElement("div"), // This is necessary for AdvancedMarkerElement
             });
+          
+            // Set the content of the marker
+            const markerContent = user1Marker.content;
+            markerContent.innerHTML = `<img src="/images/pointer.png" style="width: 50px; height: 50px;">`;
+            markerContent.style.transform = 'rotate(0deg)';
+
+            console.log(user1Marker.position);
+            
             map.setCenter(user1Marker.position);
-            map.setTilt(75);
 
             //watchposition function with extra parameters
             function success(position) {
               console.log("Success: location watchposition changed");
-              user1Marker.position = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              };
+              console.log("Position", position.coords);
+              user1Marker.position = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+              map.setCenter(user1Marker.position);
               updateMarkerRotation(position);
-            }
+
+            };
             
             function error() {
               alert("Sorry, no position available.");
@@ -72,7 +70,7 @@ async function initMap() {
               timeout: 27000,
             };
             
-            const watchID = navigator.geolocation.watchPosition(success, error, options);
+            navigator.geolocation.watchPosition(success, error, options);
             
           },
           () => {
@@ -85,17 +83,3 @@ async function initMap() {
         return
       }
 }
-
-window.initMap = initMap;
-
-// Wait for the Google Maps API to load
-function loadGoogleMaps() {
-    if (typeof google === 'object' && typeof google.maps === 'object') {
-        initMap();
-    } else {
-        setTimeout(loadGoogleMaps, 100);
-    }
-}
-
-
-document.addEventListener("DOMContentLoaded", loadGoogleMaps);  
