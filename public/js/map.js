@@ -53,7 +53,7 @@ async function initMap() {
             //watchposition function with extra parameters
             function success(position) {
               console.log("Success: location watchposition changed");
-              console.log("Position", position.coords);
+              console.log("Position", position.coords.latitude, position.coords.longitude);
               user1Marker.position = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
               map.setCenter(user1Marker.position);
               updateMarkerRotation(position);
@@ -83,5 +83,4 @@ async function initMap() {
         return
       }
 }
-
 window.initMap = initMap;
