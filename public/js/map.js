@@ -9,7 +9,7 @@ function updateMarkerRotation(position) {
 
 let map;
 
-window.initMap = async function() {
+async function initMap() {
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
@@ -54,9 +54,8 @@ window.initMap = async function() {
             function success(position) {
               console.log("Success: location watchposition changed");
               console.log("Position", position.coords);
-              const newPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-              user1Marker.setPosition(newPosition);
-              map.setCenter(newPosition);
+              user1Marker.position = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+              map.setCenter(user1Marker.position);
               updateMarkerRotation(position);
 
             };
@@ -84,3 +83,5 @@ window.initMap = async function() {
         return
       }
 }
+
+window.initMap = initMap;
