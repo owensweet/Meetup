@@ -1,15 +1,22 @@
-function updateMarkerRotation(position) {
-    if (position.coords.speed > 0) {
-      console.log('You are moving!');
-      const heading = position.coords.heading; // Get the direction of movement in degrees
-      if (typeof heading === 'number') {
-        const userMarker = map.getMarkers().find(marker => marker.getTitle() === 'Your Location'); // Find the user marker
-        if (userMarker) {
-            userMarker.setRotation(heading); // Set rotation angle to movement direction
-        } 
-      }
-      
-    }
+function getDirection(prevCoord, currCoord) {
+  //calculations to get angle between previous position and current
+  const diffLat = currCoord.lat - prevCoord.lat;
+  const diffLng = currCoord.lng - prevCoord.lng;
+
+  //if there is no movement, set the angle to upright
+  if (Math.abs(diffLat) < 0.0000001 && Math.abs(diffLng) < 0.0000001) {
+    return 0;
+  }
+
+  const antiClockwiseEastAngle = toDegrees(Math.atan2(diffLat, diffLng));
+  const clockwiseNorthAngle = 90 - antiClockwiseEastAngle;
+  return clockwiseNorthAngle;
+
+  user1Marker.content.style.transform = `rotate(45deg)`; 
+}
+
+function toDegrees(radian) {
+  return (radian * 180) / Math.PI;
 }
 
 let map;
@@ -18,7 +25,7 @@ async function initMap() {
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-   map = new google.maps.Map(document.getElementById("map"), {
+   map = new Map(document.getElementById("map"), {
         center: {lat: 49.222177, lng: -122.686493},
         zoom: 16.5,
         tilt: 45,
@@ -27,7 +34,7 @@ async function initMap() {
         gestureHandling: "greedy",
     });
     google.maps.event.addListenerOnce(map, 'idle', function() {
-        map.setTilt(45);
+        map.setTilt(90);
     });
 
     // Try HTML5 geolocation.
@@ -39,23 +46,57 @@ async function initMap() {
               lng: position.coords.longitude,
             };
 
-            const user1Marker = new google.maps.Marker({
-                map: map,
-                enableHighAccuracy: true,
-                position: pos,
-                title: 'Your Location',
-                icon: {
-                    url: '/images/pointer.png',
-                    size: new google.maps.Size(50, 50),
-                    scaledSize: new google.maps.Size(50, 50),
-                    anchor: new google.maps.Point(25, 25),
-                    tilt: 45,
-
-                }
+            const user1Marker = new AdvancedMarkerElement({
+              map,
+              position: pos,
+              title: 'Your Location',
+              content: document.createElement("div"), // This is necessary for AdvancedMarkerElement
             });
+          
+            // Set the content of the marker
+            const markerContent = user1Marker.content;
+            markerContent.innerHTML = `<img src="/images/pointer.png" style="width: 50px; height: 50px;">`;
+            markerContent.style.transform = 'rotate(0deg)';
+
+
+            console.log(user1Marker.position);
+            
             map.setCenter(user1Marker.position);
-            map.setTilt(75);
-            navigator.geolocation.watchPosition(updateMarkerRotation);
+
+
+            //watchposition function with extra parameters
+            function success(position) {
+              console.log("Success: location watchposition changed");
+
+              //previous position is the current value for usermarker position
+              const prevPos = user1Marker.position
+              
+              //here we update usermarker position to current geolocation position
+              user1Marker.position = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+              console.log("Current position", position.coords.latitude, position.coords.longitude);
+
+              const angle = getDirection(prevPos, user1Marker.position);
+              console.log("Angle: ", angle);
+              user1Marker.content.style.transform = `rotate(${angle}deg)`; 
+
+              map.panTo(user1Marker.position);
+
+              
+
+            };
+            
+            function error() {
+              alert("Sorry, no position available.");
+            }
+            
+            const options = {
+              enableHighAccuracy: true,
+              maximumAge: 30000,
+              timeout: 27000,
+            };
+            
+            navigator.geolocation.watchPosition(success, error, options);
+            
           },
           () => {
             handleLocationError(true, map.getCenter());
@@ -67,17 +108,4 @@ async function initMap() {
         return
       }
 }
-
 window.initMap = initMap;
-
-// Wait for the Google Maps API to load
-function loadGoogleMaps() {
-    if (typeof google === 'object' && typeof google.maps === 'object') {
-        initMap();
-    } else {
-        setTimeout(loadGoogleMaps, 100);
-    }
-}
-
-
-document.addEventListener("DOMContentLoaded", loadGoogleMaps);
