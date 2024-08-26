@@ -91,8 +91,8 @@ async function initMap() {
             
             const options = {
               enableHighAccuracy: true,
-              maximumAge: 30000,
-              timeout: 27000,
+              maximumAge: 0,
+              timeout: 3000,
             };
             
             navigator.geolocation.watchPosition(success, error, options);
