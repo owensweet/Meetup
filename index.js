@@ -18,6 +18,11 @@ app.get('/', (req, res) => {
     res.render("map", {apiKey: MAPSAPIKEY});
 });
 
+app.get('/mapsApiKey', (req, res) => {
+
+    res.json({ apiKey: MAPSAPIKEY });
+})
+
 
 
 app.listen(port, () => {
