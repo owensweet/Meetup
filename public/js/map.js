@@ -4,7 +4,7 @@ function getDirection(prevCoord, currCoord) {
   const diffLng = currCoord.lng - prevCoord.lng;
 
   //if there is no movement, set the angle to upright
-  if (Math.abs(diffLat) < 0.0000001 && Math.abs(diffLng) < 0.0000001) {
+  if (Math.abs(diffLat) < (0.1 / 111139) && Math.abs(diffLng) < (0.1 / (111320 * Math.cos(currCoord.lat * (Math.PI / 180))))) {
     return 0;
   }
 
