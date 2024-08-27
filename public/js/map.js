@@ -21,9 +21,14 @@ function toDegrees(radian) {
 
 let map;
 
+let directionsService;
+let directionsRenderer;
 async function initMap() {
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer();
+
 
    map = new Map(document.getElementById("map"), {
         center: {lat: 49.222177, lng: -122.686493},
@@ -36,6 +41,8 @@ async function initMap() {
     google.maps.event.addListenerOnce(map, 'idle', function() {
         map.setTilt(90);
     });
+
+    // directionsRenderer.setMap(map)
 
     // Try HTML5 geolocation.
     if (navigator.geolocation) {
@@ -102,6 +109,8 @@ async function initMap() {
             handleLocationError(true, map.getCenter());
           },
         );
+
+        
       } else {
         // Browser doesn't support Geolocation
         console.log("Browser doesn't support Geolocation");
@@ -109,3 +118,18 @@ async function initMap() {
       }
 }
 window.initMap = initMap;
+
+function calcRoute() {
+  var start = document.getElementById('start').value;
+  var end = document.getElementById('end').value;
+  var request = {
+    origin: start,
+    destination: end,
+    travelMode: 'DRIVING'
+  };
+  directionsService.route(request, function(result, status) {
+    if (status == 'OK') {
+      directionsRenderer.setDirections(result);
+    }
+  });
+}
