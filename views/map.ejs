@@ -1,24 +1,14 @@
 <%- include("templates/header") %>
 <div id="topcontainer">
   <div>
-    <strong>Start: </strong>
-    <select id="start" onchange="calcRoute();">
-      <option value="chicago, il">Chicago</option>
-      <option value="st louis, mo">St Louis</option>
-      <option value="joplin, mo">Joplin, MO</option>
-      <option value="oklahoma city, ok">Oklahoma City</option>
-      <option value="amarillo, tx">Amarillo</option>
-      <option value="gallup, nm">Gallup, NM</option>
-      <option value="flagstaff, az">Flagstaff, AZ</option>
-      <option value="winona, az">Winona</option>
-      <option value="kingman, az">Kingman</option>
-      <option value="barstow, ca">Barstow</option>
-      <option value="san bernardino, ca">San Bernardino</option>
-      <option value="los angeles, ca">Los Angeles</option>
+    <strong>You: </strong>
+    <select id="you" onchange="setThem();">
+      <option>Your Location</option>
     </select>
-    <strong>End: </strong>
-    <select id="end" onchange="calcRoute();">
+    <strong>Them: </strong>
+    <select id="them" onchange="setThem();">
       <option value="chicago, il">Chicago</option>
+      <option value="McDonald's, 12549 Harris Rd, Pitt Meadows, BC V3Y 2J4">Mcdonalds Pitt</option>
       <option value="st louis, mo">St Louis</option>
       <option value="joplin, mo">Joplin, MO</option>
       <option value="oklahoma city, ok">Oklahoma City</option>
@@ -32,8 +22,11 @@
       <option value="los angeles, ca">Los Angeles</option>
     </select>
     </div>
+
 </div>
 <div id="map"></div>
+
+
 
 <style>
     #map {
