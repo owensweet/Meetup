@@ -50,7 +50,8 @@ async function initMap() {
               map,
               position: pos,
               title: 'Your Location',
-              content: document.createElement("div"), // This is necessary for AdvancedMarkerElement
+              content: document.createElement("div"),
+              enableHighAccuracy: true,
             });
           
             // Set the content of the marker
