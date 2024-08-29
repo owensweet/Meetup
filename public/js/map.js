@@ -11,6 +11,9 @@ var geocoder;
 
 var pannedOut = false;
 
+var autocomplete;
+var autocompleteLatLng;
+
 
 function getDirection(prevCoord, currCoord) {
   //calculations to get angle between previous position and current
@@ -39,7 +42,7 @@ async function initMap() {
     geocoder = new google.maps.Geocoder();
 
     directionsService = new google.maps.DirectionsService();
-    
+
 
   //initialize map
    map = new Map(document.getElementById("map"), {
@@ -81,6 +84,9 @@ async function initMap() {
               title: 'Your Location',
               content: document.createElement("div"),
             });
+
+            initInput();
+
             user2Marker = new AdvancedMarkerElement({
               map,
               position: null,
@@ -160,8 +166,8 @@ async function initMap() {
 }
 window.initMap = initMap;
 
-function setThem() {
-  user2Marker.position = themToLatLng();
+function setThem(themlatlng) {
+  user2Marker.position = themlatlng;
 
   updateMeetupPoint();
   calcRoute(user1Marker.position, meetupMarker.position, directionsRenderer1, "WALKING");
@@ -172,27 +178,19 @@ function setThem() {
   bounds.extend(user2Marker.position);
   map.fitBounds(bounds);
   pannedOut = true;
-  
+
   google.maps.event.addListenerOnce(map, 'idle', function() {
       map.setTilt(90);
   });
 }
 
-function themToLatLng() {
-  return new google.maps.LatLng(49.23024, -122.68955);
-  //fix this geocode shit
+async function themToLatLng() {
+  //create data base of friends and if entered word is not in the session variable of friends then search from autocomplete
   var them = document.getElementById('them').value;
-  console.log("THEM LOCATION: ", them);
-  geocoder.geocode( {'address': them}, function(results, status) {
-    if (status == 'OK') {
-      console.log("GEOCODER RESULTS: ", results[0].geometry.location)
-      const themLatLng = new google.maps.LatLng(
-        results[0].geometry.location.lat,
-        results[0].geometry.location.lng
-      )
-      return themLatLng;
-    }
-  })
+  if (them == "friend1") {
+    return new google.maps.LatLng(123, 123);
+  } 
+  return;
 }
 
 function updateMeetupPoint() {
@@ -221,4 +219,28 @@ function calcRoute(start, end, render, travelMode) {
       window.alert("Directions request failed due to " + status);
     }
   });
+}
+
+function initInput() {
+  let input = document.getElementById("them");
+  const center = user1Marker.position;
+  const options = {
+    bounds: {
+      north: center.lat + 0.1,
+      south: center.lat - 0.1,
+      east: center.lng + 0.1,
+      west: center.lng - 0.1,
+    },
+    fields: ["name", "geometry"],
+    strictbounds: false,
+  }
+  autocomplete = new google.maps.places.Autocomplete(input, options)
+
+  autocomplete.addListener('place_changed', function() {
+    const place = autocomplete.getPlace();
+    console.log("PLACEINFO: ",place);
+    autocompleteLatLng = place.geometry.location;
+    console.log("PLACEGEOMETRYLOCATION: ", autocompleteLatLng);
+    setThem(autocompleteLatLng);
+  })
 }
