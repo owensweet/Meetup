@@ -1,7 +1,65 @@
 <%- include("templates/header") %>
 <div id="topcontainer">
+
+    <h1>Directions</h1>
+
     <input id="me" value="My Location">
+
+    <form id="meTravelMode">
+      <div class="travelModeImg">
+        <input id="driving" type="radio" name="meTravel" value="DRIVING" style="display: none">
+          <label for="driving">
+            <img src="/images/driving.png">
+          </label>
+      </div>
+      <div class="travelModeImg">
+        <input id="transit" type="radio" name="meTravel" value="TRANSIT" style="display: none">
+          <label for="transit">
+            <img src="/images/transit.png">
+          </label>
+      </div>
+      <div class="travelModeImg">
+        <input id="bicycling" type="radio" name="meTravel" value="BICYCLING" style="display: none">
+          <label for="bicycling">
+            <img src="/images/bicycling.png">
+          </label>
+      </div>
+      <div class="travelModeImg">
+        <input id="walking" type="radio" name="meTravel" value="WALKING" style="display: none">
+          <label for="walking">
+            <img src="/images/walking.png">
+          </label>
+      </div>
+    </form>
+
     <input id="them" placeholder="Their Location">
+
+    <form id="themTravelMode">
+      <div class="travelModeImg">
+        <input id="driving" type="radio" name="themTravel" value="DRIVING" style="display: none">
+          <label for="driving">
+            <img src="/images/driving.png">
+          </label>
+      </div>
+      <div class="travelModeImg">
+        <input id="transit" type="radio" name="themTravel" value="TRANSIT" style="display: none">
+          <label for="transit">
+            <img src="/images/transit.png">
+          </label>
+      </div>
+      <div class="travelModeImg">
+        <input id="bicycling" type="radio" name="themTravel" value="BICYCLING" style="display: none">
+          <label for="bicycling">
+            <img src="/images/bicycling.png">
+          </label>
+      </div>
+      <div class="travelModeImg">
+        <input id="walking" type="radio" name="themTravel" value="WALKING" style="display: none">
+          <label for="walking">
+            <img src="/images/walking.png">
+          </label>
+      </div>
+    </form>
 
 </div>
 <div id="map"></div>
@@ -18,7 +76,49 @@
       height: 20vh;
       width: 100%;
     }
+    #meTravelMode {
+      display: flex;
+    }
+    #meTravelMode img {
+      margin: 2px;
+    }
+    #themTravelMode {
+      display: flex;
+    }
+    #themTravelMode img {
+      margin: 2px;
+    }
 
 </style>
 
+<script>
+let initialSelect = document.querySelectorAll('input[value="WALKING"]');
+initialSelect.forEach(item => {
+  item.checked = true;
+  const initialImg = item.nextElementSibling.querySelector("img");
+  initialImg.src = "/images/walking2.png"
+})
+
+
+
+document.querySelectorAll("#meTravelMode, #themTravelMode").forEach(form => {
+  form.addEventListener('click', (event) => {
+    event.preventDefault();
+    const clickedItem = event.target.closest('.travelModeImg');
+    if (clickedItem) {
+      const radio = clickedItem.querySelector('input[type="radio"]');
+      radio.checked = true;
+
+      form.querySelectorAll('.travelModeImg').forEach(item => {
+        const img = item.querySelector('img');
+        const itemRadio = item.querySelector('input[type="radio"]');
+        const mode = itemRadio.value.toLowerCase();
+        img.src = itemRadio.checked ? `/images/${mode}2.png` : `/images/${mode}.png`;
+      });
+
+      console.log("clicked: ", radio.value);
+    }
+  });
+});
+</script>
 <%- include("templates/footer") %>

@@ -14,6 +14,9 @@ var pannedOut = false;
 var autocomplete;
 var autocompleteLatLng;
 
+var meTravelMode;
+var themTravelMode;
+
 
 function getDirection(prevCoord, currCoord) {
   //calculations to get angle between previous position and current
@@ -170,8 +173,11 @@ function setThem(themlatlng) {
   user2Marker.position = themlatlng;
 
   updateMeetupPoint();
-  calcRoute(user1Marker.position, meetupMarker.position, directionsRenderer1, "WALKING");
-  calcRoute(user2Marker.position, meetupMarker.position, directionsRenderer2, "WALKING");
+
+  meTravelMode = checkMyTravelMode();
+  themTravelMode = checkMyTravelMode();
+  calcRoute(user1Marker.position, meetupMarker.position, directionsRenderer1, meTravelMode);
+  calcRoute(user2Marker.position, meetupMarker.position, directionsRenderer2, themTravelMode);
 
   const bounds = new google.maps.LatLngBounds();
   bounds.extend(user1Marker.position);
@@ -243,4 +249,24 @@ function initInput() {
     console.log("PLACEGEOMETRYLOCATION: ", autocompleteLatLng);
     setThem(autocompleteLatLng);
   })
+}
+
+function checkMyTravelMode() {
+  var mymode;
+  document.querySelectorAll('input[name="meTravel"]').forEach(radio => {
+    if (radio.checked == true) {
+      mymode = radio.value;
+    }
+  })
+  return mymode;
+}
+
+function checkTheirTravelMode() {
+  var theirmode;
+  document.querySelectorAll('input[name="themTravel"]').forEach(radio => {
+    if (radio.checked == true) {
+      theirmode = radio.value;
+    }
+  })
+  return theirmode;
 }
