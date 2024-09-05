@@ -17,16 +17,12 @@ var autocompleteLatLng;
 var meTravelMode;
 var themTravelMode;
 
+var middlepos;
 
 function getDirection(prevCoord, currCoord) {
   //calculations to get angle between previous position and current
   const diffLat = currCoord.lat - prevCoord.lat;
   const diffLng = currCoord.lng - prevCoord.lng;
-
-  //if there is no movement, set the angle to upright
-  if (Math.abs(diffLat) < (1 / 111139) && Math.abs(diffLng) < (1 / (111320 * Math.cos(currCoord.lat * (Math.PI / 180))))) {
-    return 0;
-  }
 
   const antiClockwiseEastAngle = toDegrees(Math.atan2(diffLat, diffLng));
   const clockwiseNorthAngle = 90 - antiClockwiseEastAngle;
@@ -70,6 +66,10 @@ async function initMap() {
       map: map,
       suppressMarkers: true,
       polylineOptions: { strokeColor: "purple"}
+    })
+    meetupRenderer = new google.maps.DirectionsRenderer({
+      map: map,
+      suppressMarkers: true,
     })
 
     // Try HTML5 geolocation.
@@ -169,10 +169,13 @@ async function initMap() {
 }
 window.initMap = initMap;
 
-function setThem(themlatlng) {
+async function setThem(themlatlng) {
   user2Marker.position = themlatlng;
 
-  updateMeetupPoint();
+  if (user2Marker.position) {
+    await updateMeetupPoint();  
+  }
+  
 
   meTravelMode = checkMyTravelMode();
   themTravelMode = checkMyTravelMode();
@@ -182,12 +185,12 @@ function setThem(themlatlng) {
   const bounds = new google.maps.LatLngBounds();
   bounds.extend(user1Marker.position);
   bounds.extend(user2Marker.position);
-  map.fitBounds(bounds);
+  map.fitBounds(bounds, { padding: 50 });
   pannedOut = true;
 
-  google.maps.event.addListenerOnce(map, 'idle', function() {
-      map.setTilt(90);
-  });
+  // google.maps.event.addListenerOnce(map, 'idle', function() {
+  //     map.setTilt(90);
+  // });
 }
 
 async function themToLatLng() {
@@ -199,17 +202,21 @@ async function themToLatLng() {
   return;
 }
 
-function updateMeetupPoint() {
+async function updateMeetupPoint() {
+  //find the meetup point in a different way, i should use
+  // a directions render to render a route from user1pos to user2pos,
+  // find the floor divide by two of the direction steps array and then
+  // set the meetupMarker position to that leg's position
+
   const user1pos = user1Marker.position;
   const user2pos = user2Marker.position;
 
-  if (user1pos && user2pos) {
-    const middlepos = {
-      lat: (user1pos.lat + user2pos.lat) / 2,
-      lng: (user1pos.lng + user2pos.lng) / 2
-    }
-    meetupMarker.position = middlepos;
+  if (!user1pos || !user2pos) {
+    console.error("Both user positions need to be set before calculating the meetup point.");
+    return;
   }
+
+  meetupMarker.position = await calcMeetupRoute(user1pos, user2pos, meetupRenderer);
 }
 
 function calcRoute(start, end, render, travelMode) {
@@ -218,13 +225,56 @@ function calcRoute(start, end, render, travelMode) {
     destination: end,
     travelMode: google.maps.TravelMode[travelMode]
   };
-  directionsService.route(request, function(result, status) {
-    if (status == 'OK') {
-      render.setDirections(result);
-    } else {
-      window.alert("Directions request failed due to " + status);
-    }
-  });
+  directionsService.route(request).then((result) => {
+    render.setDirections(result);
+  })
+}
+
+//returns location of the middle leg
+async function calcMeetupRoute(start, end, render) {
+  const request = {
+    origin: start,
+    destination: end,
+    travelMode: google.maps.TravelMode.WALKING
+  };
+  await directionsService.route(request)
+    .then((result) => {
+
+      const theroute = result.routes[0].legs[0];
+      const totalDistance = theroute.distance.value;
+      console.log(checkMyTravelMode());
+      console.log(checkTheirTravelMode());
+      const meetupDistance = totalDistance / 2;
+      let distanceCounter = 0;
+      const steps = theroute.steps;
+
+      for (let i = 0; i < steps.length; i++) {
+        const stepDistance = steps[i].distance.value;
+
+        //if adding the next step breaks past half, then we are on the middle step
+        if (distanceCounter + stepDistance >= meetupDistance) {
+          const remainingDistance = meetupDistance - distanceCounter;
+
+          //bigger ratio if remaining distance is bigger compared to stepDistance
+          const ratio = remainingDistance / stepDistance
+
+          const start = steps[i].start_location;
+          const end = steps[i].end_location;
+
+          middlepos = interpolate(start, end, ratio);
+          break;
+
+        }
+
+        distanceCounter += stepDistance;
+
+      }
+  })
+  .catch((err) => {
+    console.error("Error fetching directions: ", err);
+  })
+
+  return middlepos;
 }
 
 function initInput() {
@@ -269,4 +319,10 @@ function checkTheirTravelMode() {
     }
   })
   return theirmode;
+}
+
+function interpolate(start, end, ratio) {
+  const lat = start.lat() + (end.lat() - start.lat()) * ratio;
+  const lng = start.lng() + (end.lng() - start.lng()) * ratio;
+  return new google.maps.LatLng(lat, lng);
 }
