@@ -19,6 +19,8 @@ var themTravelMode;
 
 var middlepos;
 
+var listener;
+
 function getDirection(prevCoord, currCoord) {
   //calculations to get angle between previous position and current
   const diffLat = currCoord.lat - prevCoord.lat;
@@ -49,12 +51,9 @@ async function initMap() {
         zoom: 16.5,
         tilt: 45,
         // mapId: "25b1316f79a00934",
-        mapId: "90f87356969d889c",
+        mapId: "25b1316f79a00934",
         disableDefaultUI: true,
         gestureHandling: "greedy",
-    });
-    google.maps.event.addListenerOnce(map, 'idle', function() {
-        map.setTilt(90);
     });
 
     directionsRenderer1 = new google.maps.DirectionsRenderer({
@@ -71,6 +70,9 @@ async function initMap() {
       map: map,
       suppressMarkers: true,
     })
+
+    initCenterButton()
+
 
     // Try HTML5 geolocation.
     if (navigator.geolocation) {
@@ -102,6 +104,8 @@ async function initMap() {
               title: 'Meetup spot',
               content: document.createElement("div")
             })
+
+            initMeetupClickable();
           
             // set the content of the marker
             const marker1Content = user1Marker.content;
@@ -171,26 +175,36 @@ window.initMap = initMap;
 
 async function setThem(themlatlng) {
   user2Marker.position = themlatlng;
+  
+ 
 
   if (user2Marker.position) {
     await updateMeetupPoint();  
   }
+  const bounds = new google.maps.LatLngBounds();
+  bounds.extend(user1Marker.position);
+  bounds.extend(user2Marker.position);
+  bounds.extend(meetupMarker.position);
+  listener = google.maps.event.addListener(map, 'idle', function() {
+    if (pannedOut = true) {
+      map.fitBounds(bounds);
+    }
+    
+  });
   
 
   meTravelMode = checkMyTravelMode();
   themTravelMode = checkMyTravelMode();
+  
   calcRoute(user1Marker.position, meetupMarker.position, directionsRenderer1, meTravelMode);
   calcRoute(user2Marker.position, meetupMarker.position, directionsRenderer2, themTravelMode);
 
-  const bounds = new google.maps.LatLngBounds();
-  bounds.extend(user1Marker.position);
-  bounds.extend(user2Marker.position);
-  map.fitBounds(bounds, { padding: 50 });
   pannedOut = true;
+  
 
-  // google.maps.event.addListenerOnce(map, 'idle', function() {
-  //     map.setTilt(90);
-  // });
+  google.maps.event.addListener(map, 'idle', function() {
+      map.setTilt(45);
+  });
 }
 
 async function themToLatLng() {
@@ -217,6 +231,8 @@ async function updateMeetupPoint() {
   }
 
   meetupMarker.position = await calcMeetupRoute(user1pos, user2pos, meetupRenderer);
+
+
 }
 
 function calcRoute(start, end, render, travelMode) {
@@ -325,4 +341,26 @@ function interpolate(start, end, ratio) {
   const lat = start.lat() + (end.lat() - start.lat()) * ratio;
   const lng = start.lng() + (end.lng() - start.lng()) * ratio;
   return new google.maps.LatLng(lat, lng);
+}
+
+function initCenterButton() {
+  const centerButton = document.getElementById("centerButton");
+  centerButton.addEventListener('click', function() {
+    google.maps.event.removeListener(listener);
+    pannedOut = false;
+    map.panTo(user1Marker.position);
+    google.maps.event.addListenerOnce(map, 'idle', function() {
+      map.setZoom(18);
+      map.setTilt(90);
+  });
+  })
+}
+
+function initMeetupClickable() {
+  meetupMarker.addListener('click', function() {
+    google.maps.event.removeListener(listener);
+    pannedOut = true;
+    map.panTo(meetupMarker.position);
+    map.setZoom(16);
+  })
 }

@@ -1,7 +1,7 @@
 <%- include("templates/header") %>
 <div id="topcontainer">
 
-    <h1>Directions</h1>
+    <h1 id="directions">Directions</h1>
 
     <input id="me" value="My Location">
 
@@ -60,8 +60,10 @@
           </label>
       </div>
     </form>
-
 </div>
+
+<div id="startButton">Start</div>
+
 <div id="map"></div>
 
 <div id="centerButton"></div>
@@ -69,34 +71,84 @@
 
 
 <style>
+    body {
+      background-color: #222023;
+      font-family: "Kanit", sans-serif;
+      font-weight: 600;
+      font-style: normal;
+      
+    }
+    #me {
+      color: white; 
+    }
+    ::placeholder {
+      color: white;
+    }
+    input {
+      background-color: #302D33;
+      border: none;
+      border-radius: 10px;
+      width: 75%;
+      height: 12%;
+      margin: 0 10% 0 15%;
+      color: white;
+    }
     #map {
-      height: 78vh;
+      height: 74vh;
       width: 100%;
       z-index: 1;
     }
     #topcontainer {
-      height: 20vh;
+      height: 26vh;
       width: 100%;
     }
     #meTravelMode {
       display: flex;
+      margin-left: 10%;
+      width: 80%;
     }
     #meTravelMode img {
       margin: 2px;
     }
     #themTravelMode {
       display: flex;
+      margin-left: 10%;
+      width: 80%;
     }
     #themTravelMode img {
       margin: 2px;
     }
+    #meTravelMode * {
+      margin: 0 1%;
+    }
+    #themTravelMode * {
+      margin: 0 1%;
+    }
     #centerButton {
-      width: 100px;
-      height: 100px;
+      width: 70px;
+      height: 70px;
       background-color: purple;
       border-radius: 50%;
       z-index: 1000;
-      
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+
+    }
+    #directions {
+      color: white;
+      font-weight: 500;
+    }
+    #startButton {
+      border-radius: 10px;
+      background-color: #8F00FF;
+      color: white;
+      width: 30%;
+      height: 15%;
+      display: flex;
+      justify-content: center;
+      margin: 0 auto;
+      margin-bottom: 10px;
     }
 
 </style>
