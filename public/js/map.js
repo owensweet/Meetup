@@ -295,6 +295,7 @@ async function calcMeetupRoute(start, end, render) {
 
       totalDuration = user1Duration + user2Duration;
 
+      //why does it only work when user2 is the top of the ratio
       meetupRatio = user2Duration / totalDuration;
 
       const meetupDistance = totalDistance * meetupRatio;
