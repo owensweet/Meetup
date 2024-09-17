@@ -3,7 +3,7 @@
 
     <h1 id="directions">Directions</h1>
 
-    <input id="me" value="My Location">
+    <input id="me" placeholder="My Location">
 
     <form id="meTravelMode">
       <div class="travelModeImg">
@@ -68,30 +68,30 @@
 
 <div id="centerButton"></div>
 
-
+<div id="meetupButton"></div>
 
 <style>
     body {
       background-color: #222023;
-      font-family: "Kanit", sans-serif;
+      font-family: "Kanit", sans-serif !important;
       font-weight: 600;
       font-style: normal;
-      
-    }
-    #me {
-      color: white; 
     }
     ::placeholder {
       color: white;
+      padding: 0 10px;
+      font-size: 16px;
+      font-family: "Kanit", sans-serif !important;
     }
     input {
       background-color: #302D33;
       border: none;
       border-radius: 10px;
-      width: 75%;
+      width: 80%;
       height: 12%;
-      margin: 0 10% 0 15%;
+      margin: 0 10% 0 10%;
       color: white;
+      outline: none;
     }
     #map {
       height: 74vh;
@@ -102,6 +102,12 @@
       height: 26vh;
       width: 100%;
     }
+    #meTravelMode * {
+      margin: 2px 1%;
+    }
+    #themTravelMode * {
+      margin: 2px 1%;
+    }
     #meTravelMode {
       display: flex;
       margin-left: 10%;
@@ -109,6 +115,7 @@
     }
     #meTravelMode img {
       margin: 2px;
+      width: 100%;
     }
     #themTravelMode {
       display: flex;
@@ -117,13 +124,9 @@
     }
     #themTravelMode img {
       margin: 2px;
+      width: 100%;
     }
-    #meTravelMode * {
-      margin: 0 1%;
-    }
-    #themTravelMode * {
-      margin: 0 1%;
-    }
+
     #centerButton {
       width: 70px;
       height: 70px;
@@ -135,9 +138,20 @@
       right: 10px;
 
     }
+    #meetupButton {
+      width: 70px;
+      height: 70px;
+      background-color: #8a2cb9;
+      border-radius: 50%;
+      z-index: 1000;
+      position: absolute;
+      bottom:90px;
+      right: 10px;
+    }
     #directions {
       color: white;
       font-weight: 500;
+      margin-left: 10%;
     }
     #startButton {
       border-radius: 10px;
@@ -149,6 +163,12 @@
       justify-content: center;
       margin: 0 auto;
       margin-bottom: 10px;
+    }
+    .meetup-button {
+    transition: background-color 0.25s ease-in-out;
+    }
+    .meetup-button.selected {
+      background-color: red;
     }
 
 </style>
