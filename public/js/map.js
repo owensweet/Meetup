@@ -259,14 +259,22 @@ function calcRoute(start, end, render, travelMode) {
 //returns location of the middle point
 async function calcMeetupRoute(start, end, render) {
 
-  
+  var user1Duration;
+  var user2Duration;
+  var totalDuration;
+  var meetupRatio
+
   const user1Mode = checkMyTravelMode();
   const user2Mode = checkTheirTravelMode();
 
   console.log("user1modw: ", user1Mode);
 
-  const user1Duration = await getDuration(start, end, user1Mode);
-  const user2Duration = await getDuration(end, start, user2Mode);
+  await getDuration(start, end, user1Mode, function(res) {
+    user1Duration = res;
+  });
+  await getDuration(end, start, user2Mode, function(res) {
+    user2Duration = res;
+  });
 
 
   const request = {
@@ -283,18 +291,11 @@ async function calcMeetupRoute(start, end, render) {
       console.log(checkMyTravelMode());
       console.log(checkTheirTravelMode());
 
-      //there should be mutiple ratios:
-      //drive to walk is the max going negative if user2travelmode is quicker
-      //drive to bike is second
-
-      //user1 time / user 2 time
-//leg0 duration for each calcroute?
-//or distance matrix api but directions would be the same
-
       console.log("user1inf: ", user1Duration);
 
-      let meetupRatio = user1Duration / user2Duration;
+      totalDuration = user1Duration + user2Duration;
 
+      meetupRatio = user2Duration / totalDuration;
 
       const meetupDistance = totalDistance * meetupRatio;
 
@@ -357,7 +358,14 @@ function initInput() {
     autocompleteLatLng = place.geometry.location;
     console.log("PLACEGEOMETRYLOCATION: ", autocompleteLatLng);
     setThem(autocompleteLatLng);
-  })
+  });
+
+  document.querySelectorAll("#meTravelMode, #themTravelMode").forEach(form => {
+    form.addEventListener('click', (event) => {
+      console.log("onchange");
+      setThem(autocompleteLatLng);
+    })
+  });
 }
 
 //checking the user 2 travel mode
@@ -430,16 +438,14 @@ function initMeetupClickable() {
   })
 }
 
-async function getDuration(start, end, travelMode) {
+async function getDuration(start, end, travelMode, func) {
   await distanceService.getDistanceMatrix(
     {
       origins: [start],
       destinations: [end],
       travelMode: travelMode,
-    }, durationCallback );
-}
-
-function durationCallback(response) {
-  console.log(response.rows[0].elements[0].duration.value);
-  return response.rows[0].elements[0].duration.value;
+    }, function(response) {
+      console.log(response.rows[0].elements[0].duration.value);
+      func(response.rows[0].elements[0].duration.value);
+    });
 }
