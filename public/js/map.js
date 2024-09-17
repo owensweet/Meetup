@@ -50,9 +50,13 @@ async function initMap() {
 
     geocoder = new google.maps.Geocoder();
 
-    directionsService = new google.maps.DirectionsService();
+    directionsService = new google.maps.DirectionsService({
+      preserveViewport: true
+    });
 
-    distanceService = new google.maps.DistanceMatrixService();
+    distanceService = new google.maps.DistanceMatrixService({
+      preserveViewport: true
+    });
 
 
   //initialize map
@@ -71,12 +75,14 @@ async function initMap() {
     directionsRenderer1 = new google.maps.DirectionsRenderer({
       map: map,
       suppressMarkers: true,
-      polylineOptions: { strokeColor: "purple"}
+      polylineOptions: { strokeColor: "purple"},
+      preserveViewport: true
     });
     directionsRenderer2 = new google.maps.DirectionsRenderer({
       map: map,
       suppressMarkers: true,
-      polylineOptions: { strokeColor: "purple"}
+      polylineOptions: { strokeColor: "purple"},
+      preserveViewport: true
     })
     meetupRenderer = new google.maps.DirectionsRenderer({
       map: map,
@@ -190,24 +196,31 @@ window.initMap = initMap;
 //route. Then renderers the route from each user to the meetup point
 //
 async function setThem(themlatlng) {
+  console.log("pannedOut: ", pannedOut);
   user2Marker.position = themlatlng;
   
  
 //if user2Marker position is not null, call the function to update
 //the meetup point
-  if (user2Marker.position) {
-    await updateMeetupPoint();  
+  if (!user2Marker.position) {
+    console.error("No user2 position");
+    return;
   }
+
+  await updateMeetupPoint();  
+
   const bounds = new google.maps.LatLngBounds();
   bounds.extend(user1Marker.position);
   bounds.extend(user2Marker.position);
   bounds.extend(meetupMarker.position);
-  listener = google.maps.event.addListener(map, 'idle', function() {
-    if (pannedOut = true) {
+
+  if (pannedOut) {
+    //could i make this smoother / slower animation with timeout?
       map.fitBounds(bounds);
-    }
+  }
     
-  });
+
+  pannedOut = true;
   
 
   meTravelMode = checkMyTravelMode();
@@ -217,7 +230,6 @@ async function setThem(themlatlng) {
   calcRoute(user1Marker.position, meetupMarker.position, directionsRenderer1, meTravelMode);
   calcRoute(user2Marker.position, meetupMarker.position, directionsRenderer2, themTravelMode);
 
-  pannedOut = true;
 }
 
 //themToLatLng function
@@ -262,7 +274,7 @@ async function calcMeetupRoute(start, end, render) {
   var user1Duration;
   var user2Duration;
   var totalDuration;
-  var meetupRatio
+  var meetupRatio;
 
   const user1Mode = checkMyTravelMode();
   const user2Mode = checkTheirTravelMode();
@@ -358,12 +370,14 @@ function initInput() {
     console.log("PLACEINFO: ",place);
     autocompleteLatLng = place.geometry.location;
     console.log("PLACEGEOMETRYLOCATION: ", autocompleteLatLng);
+    pannedOut = true;
     setThem(autocompleteLatLng);
   });
 
   document.querySelectorAll("#meTravelMode, #themTravelMode").forEach(form => {
     form.addEventListener('click', (event) => {
       console.log("onchange");
+      pannedOut = true;
       setThem(autocompleteLatLng);
     })
   });
@@ -406,6 +420,8 @@ function initCenterButton() {
     google.maps.event.removeListener(listener);
     pannedOut = false;
     map.panTo(user1Marker.position);
+
+    //zoom one time after the map is idle
     google.maps.event.addListenerOnce(map, 'idle', function() {
       map.setZoom(18);
       map.setTilt(70);
@@ -432,7 +448,7 @@ function initMeetupClickable() {
         meetupButton.classList.remove('meetup-button');
       }, 500);
     } else {
-    pannedOut = true;
+    pannedOut = false;
     map.panTo(meetupMarker.position);
     map.setZoom(16);
     }
