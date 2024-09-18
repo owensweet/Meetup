@@ -15,7 +15,7 @@ app.use("/images", express.static("./public/images"));
 
 app.get('/', (req, res) => {
     
-    res.render("map", {apiKey: MAPSAPIKEY});
+    res.render("map", { apiKey: MAPSAPIKEY });
 });
 
 //currently unused route for fetching apikey
