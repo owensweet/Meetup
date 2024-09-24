@@ -24,6 +24,8 @@ var middlepos;
 
 var listener;
 
+const FIT_BOUNDS_PADDING_PX = 50;
+
 // getDirection uses math to calculate the 
 // angle between the two inputted coordinates
 function getDirection(prevCoord, currCoord) {
@@ -81,12 +83,13 @@ async function initMap() {
     directionsRenderer2 = new google.maps.DirectionsRenderer({
       map: map,
       suppressMarkers: true,
-      polylineOptions: { strokeColor: "purple"},
+      polylineOptions: { strokeColor: "black"}, //try hex w singe quote and declare strokWeight to 6 and opacity
       preserveViewport: true
     })
     meetupRenderer = new google.maps.DirectionsRenderer({
       map: map,
       suppressMarkers: true,
+      polylineOptions: { stroke: 0},
     })
 
     initCenterButton()
@@ -216,7 +219,7 @@ async function setThem(themlatlng) {
 
   if (pannedOut) {
     //could i make this smoother / slower animation with timeout?
-      map.fitBounds(bounds);
+      map.fitBounds(bounds, FIT_BOUNDS_PADDING_PX);
   }
     
 
