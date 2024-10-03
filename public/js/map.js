@@ -295,7 +295,7 @@ async function calcMeetupRoute(start, end, render) {
   const request = {
     origin: start,
     destination: end,
-    travelMode: google.maps.TravelMode.WALKING
+    travelMode: google.maps.TravelMode.user1Duration;
   };
   await directionsService.route(request)
     .then((result) => {
