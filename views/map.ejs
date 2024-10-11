@@ -93,14 +93,17 @@
       margin: 0 10% 0 10%;
       color: white;
       outline: none;
+      font-size: 17px;
+      font-family: "Kanit", sans-serif !important;
+      font-weight: 500;
     }
     #map {
-      height: 70vh;
+      height: 68vh;
       width: 100%;
       z-index: 1;
     }
     #topcontainer {
-      height: 30vh;
+      height: 32vh;
       width: 100%;
     }
     #meTravelMode * {
@@ -159,7 +162,7 @@
       color: white;
       font-weight: 500;
       margin-left: 10%;
-      margin-bottom: 2%;
+      margin-bottom: 0%;
       height: 20%;
     }
     #startButton {
@@ -171,12 +174,56 @@
       display: flex;
       justify-content: center;
       margin: 0px auto;
+      font-size: 0.8em;
+      text-align: center;
+      align-items: center;
     }
     .meetup-button {
     transition: background-color 0.25s ease-in-out;
     }
     .meetup-button.selected {
       background-color: red;
+    }
+
+    /* Mobile to Tablet view width */
+    @media screen and (min-width: 475px) {
+
+      #meTravelMode img {
+        max-width: 84px;
+      }
+
+      #meTravelMode * {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+      }
+
+      #themTravelMode img {
+        max-width: 84px;
+      }
+
+      #themTravelMode * {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+      }
+
+    }
+
+    /* Desktop view width */
+    @media screen and (min-width: 640px) {
+      
+      #map {
+        height: 100vh;
+        z-index: 1;
+      }
+      #topcontainer {
+        height: 32vh;
+        width: 40%;
+        z-index: 1000;
+        position: absolute;
+        max-width: 400px;
+      }
     }
 
 </style>
