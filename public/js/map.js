@@ -77,7 +77,7 @@ async function initMap() {
     directionsRenderer1 = new google.maps.DirectionsRenderer({
       map: map,
       suppressMarkers: true,
-      polylineOptions: { strokeColor: "purple"},
+      polylineOptions: { strokeColor: "purple", strokeWeight: 6},
       preserveViewport: true
     });
     directionsRenderer2 = new google.maps.DirectionsRenderer({
@@ -498,4 +498,31 @@ function initCenterButton() {
 
 function startDirections() {
 
+}
+
+function adjustPolylineStroke() {
+  map.addListener('zoom_changed', function() {
+    zoomToStroke();
+  })
+}
+
+function zoomToStroke() {
+
+  let newStrokeWeight;
+
+  const zoom = map.getZoom();
+
+  console.log("zoom", zoom);
+
+  if (zoom > 15) {
+    newStrokeWeight = 20;  // Thicker lines at higher zoom
+  } else if (zoom < 13) {
+    newStrokeWeight = 6;   // Thinner lines at lower zoom
+  }
+
+  directionsRenderer1.setOptions({
+    polylineOptions: {
+      strokeWeight: newStrokeWeight
+    }
+  });
 }
