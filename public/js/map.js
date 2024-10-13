@@ -24,6 +24,8 @@ var middlepos;
 
 var listener;
 
+const FIT_BOUNDS_PADDING_PX = 50;
+
 // getDirection uses math to calculate the 
 // angle between the two inputted coordinates
 function getDirection(prevCoord, currCoord) {
@@ -75,19 +77,19 @@ async function initMap() {
     directionsRenderer1 = new google.maps.DirectionsRenderer({
       map: map,
       suppressMarkers: true,
-      polylineOptions: { strokeColor: "purple"},
+      polylineOptions: { strokeColor: "purple", strokeWeight: 6},
       preserveViewport: true
     });
     directionsRenderer2 = new google.maps.DirectionsRenderer({
       map: map,
       suppressMarkers: true,
-      polylineOptions: { strokeColor: "purple"},
+      polylineOptions: { strokeColor: "black"}, //try hex w singe quote and declare strokWeight to 6 and opacity
       preserveViewport: true
     })
     meetupRenderer = new google.maps.DirectionsRenderer({
       map: map,
       suppressMarkers: true,
-      poly
+      polylineOptions: { stroke: 0},
     })
 
     initCenterButton()
@@ -217,19 +219,19 @@ async function setThem(themlatlng) {
 
   if (pannedOut) {
     //could i make this smoother / slower animation with timeout?
-      map.fitBounds(bounds);
+      map.fitBounds(bounds, FIT_BOUNDS_PADDING_PX);
   }
     
 
   pannedOut = true;
   
 
-  meTravelMode = checkMyTravelMode();
-  themTravelMode = checkMyTravelMode();
+  meTravelMode = await checkMyTravelMode();
+  themTravelMode = await checkMyTravelMode();
   
   //calculate route from each user coordinate to the meetup coordinate
-  calcRoute(user1Marker.position, meetupMarker.position, directionsRenderer1, meTravelMode);
-  calcRoute(user2Marker.position, meetupMarker.position, directionsRenderer2, themTravelMode);
+  await calcRoute(user1Marker.position, meetupMarker.position, directionsRenderer1, meTravelMode);
+  await calcRoute(user2Marker.position, meetupMarker.position, directionsRenderer2, themTravelMode);
 
 }
 
@@ -276,6 +278,7 @@ async function calcMeetupRoute(start, end, render) {
   var user2Duration;
   var totalDuration;
   var meetupRatio;
+  var longerMode;
 
   const user1Mode = checkMyTravelMode();
   const user2Mode = checkTheirTravelMode();
@@ -289,11 +292,17 @@ async function calcMeetupRoute(start, end, render) {
     user2Duration = res;
   });
 
+  longerMode = user1Duration > user2Duration ? user1Mode : user2Mode;
+
+  if (user1Duration == user2Duration) {
+    longerMode = user1Mode;
+  }
+
 
   const request = {
     origin: start,
     destination: end,
-    travelMode: google.maps.TravelMode.WALKING
+    travelMode: google.maps.TravelMode[longerMode],
   };
   await directionsService.route(request)
     .then((result) => {
@@ -308,7 +317,7 @@ async function calcMeetupRoute(start, end, render) {
 
       totalDuration = user1Duration + user2Duration;
 
-      //why does it only work when user2 is the top of the ratio
+      
       meetupRatio = user2Duration / totalDuration;
 
       const meetupDistance = totalDistance * meetupRatio;
@@ -466,4 +475,54 @@ async function getDuration(start, end, travelMode, func) {
       console.log(response.rows[0].elements[0].duration.value);
       func(response.rows[0].elements[0].duration.value);
     });
+}
+
+//Attaching event listener to the start button to start the route
+function initCenterButton() {
+  const startButton = document.getElementById("startButton");
+  startButton.addEventListener('click', function() {
+
+    if (user2Marker.position != null) {
+      google.maps.event.removeListener(listener);
+      pannedOut = false;
+      map.panTo(user1Marker.position);
+
+      //zoom one time after the map is idle
+      google.maps.event.addListenerOnce(map, 'idle', function() {
+        map.setZoom(20);
+        map.setTilt(70);
+      });
+    }
+  })
+}
+
+function startDirections() {
+
+}
+
+function adjustPolylineStroke() {
+  map.addListener('zoom_changed', function() {
+    zoomToStroke();
+  })
+}
+
+function zoomToStroke() {
+
+  let newStrokeWeight;
+
+  const zoom = map.getZoom();
+
+  console.log("zoom", zoom);
+
+  if (zoom > 15) {
+    newStrokeWeight = 20;  // Thicker lines at higher zoom
+  } else if (zoom < 13) {
+    newStrokeWeight = 6;   // Thinner lines at lower zoom
+  }
+
+  directionsRenderer1.setOptions({
+    polylineOptions: {
+      strokeWeight: newStrokeWeight
+    }
+  });
 }
