@@ -431,7 +431,6 @@ function interpolate(start, end, ratio) {
 function initCenterButton() {
   const centerButton = document.getElementById("centerButton");
   centerButton.addEventListener('click', function() {
-    console.log('clicked');
     google.maps.event.removeListener(listener);
     pannedOut = false;
     map.panTo(user1Marker.position);
