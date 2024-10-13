@@ -92,7 +92,8 @@ async function initMap() {
       polylineOptions: { stroke: 0},
     })
 
-    initCenterButton()
+    initCenterButton();
+    initStartButton();
 
 
     // Try HTML5 geolocation.
@@ -132,14 +133,17 @@ async function initMap() {
             const marker1Content = user1Marker.content;
             marker1Content.innerHTML = `<img src="/images/pointer.png" style="width: 50px; height: 50px;">`;
             marker1Content.style.transform = 'rotate(0deg)';
+            marker1Content.style.transform = 'translateY(25px)';
 
             const marker2Content = user2Marker.content;
             marker2Content.innerHTML = `<img src="/images/pointer2.png" style="width: 50px; height: 50px">`;
             marker2Content.style.transform = 'rotate(0deg)';
+            marker2Content.style.transform = 'translateY(25px)';
 
             const meetupMarkerContent = meetupMarker.content;
             meetupMarkerContent.innerHTML = `<img src="/images/meetuppoint.png" style="width: 35px; height: 50px">`;
             meetupMarkerContent.style.transform = 'rotate(0deg)';
+            meetupMarkerContent.style.transform = 'translateY(25px)';
 
             console.log(user1Marker.position);
             
@@ -427,6 +431,7 @@ function interpolate(start, end, ratio) {
 function initCenterButton() {
   const centerButton = document.getElementById("centerButton");
   centerButton.addEventListener('click', function() {
+    console.log('clicked');
     google.maps.event.removeListener(listener);
     pannedOut = false;
     map.panTo(user1Marker.position);
@@ -478,7 +483,7 @@ async function getDuration(start, end, travelMode, func) {
 }
 
 //Attaching event listener to the start button to start the route
-function initCenterButton() {
+function initStartButton() {
   const startButton = document.getElementById("startButton");
   startButton.addEventListener('click', function() {
 
@@ -514,10 +519,10 @@ function zoomToStroke() {
 
   console.log("zoom", zoom);
 
-  if (zoom > 15) {
-    newStrokeWeight = 20;  // Thicker lines at higher zoom
-  } else if (zoom < 13) {
-    newStrokeWeight = 6;   // Thinner lines at lower zoom
+  if (zoom > 16) {
+    newStrokeWeight = 20;
+  } else {
+    newStrokeWeight = 3;
   }
 
   directionsRenderer1.setOptions({
