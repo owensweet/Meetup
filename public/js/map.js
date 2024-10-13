@@ -87,6 +87,7 @@ async function initMap() {
     meetupRenderer = new google.maps.DirectionsRenderer({
       map: map,
       suppressMarkers: true,
+      poly
     })
 
     initCenterButton()
