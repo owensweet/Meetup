@@ -159,7 +159,10 @@ async function initMap() {
               const prevPos = user1Marker.position
               
               //Here we update usermarker position to current geolocation position
-              user1Marker.position = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+              setTimeout(function() {
+                user1Marker.position = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+              }, 1000);
+              
               console.log("Current position", position.coords.latitude, position.coords.longitude);
 
               //Move down 25px so that center of the img is the anchor of the element
