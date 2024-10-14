@@ -85,12 +85,9 @@
       font-style: normal;
       height: 100vh;
       overflow-y: scroll;
-      display: grid;
       padding: 0;
       margin: 0;
       border: 0;
-      grid-template-rows: 35% 65%;
-      grid-template-columns: 100%;
     }
     ::placeholder {
       color: white;
@@ -112,7 +109,6 @@
       font-weight: 500;
     }
     #map {
-      grid-row: 2;
       height: 68vh;
       width: 100%;
       z-index: 1;
@@ -176,12 +172,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.5s ease-in-out;
-      grid-row: 2;
-      margin-left: auto;
-      margin-top: auto;
-      margin-bottom: 10px;
-      margin-right: 10px;
+      transition: transform 0.6s cubic-bezier(0.83, 0, 0.17, 1);
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
     }
     #themButton {
       width: 60px;
@@ -192,11 +186,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.5s ease-in-out;
-      margin-left: auto;
-      margin-top: auto;
-      margin-bottom: 10px;
-      margin-right: 10px;
+      transition: transform 0.6s cubic-bezier(0.83, 0, 0.17, 1);
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
     }
     #centerButton img, #meetupButton img, #themButton img {
       width: 65%;

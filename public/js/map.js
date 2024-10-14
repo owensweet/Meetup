@@ -94,6 +94,7 @@ async function initMap() {
 
     initCenterButton();
     initStartButton();
+    initThemButton();
 
 
     // Try HTML5 geolocation.
@@ -134,6 +135,7 @@ async function initMap() {
             marker1Content.innerHTML = `<img src="/images/pointer.png" style="width: 50px; height: 50px;">`;
             marker1Content.style.transform = 'rotate(0deg)';
             marker1Content.style.transform = 'translateY(25px)';
+            marker1Content.style.transition = 'transform 1 linear';
 
             const marker2Content = user2Marker.content;
             marker2Content.innerHTML = `<img src="/images/pointer2.png" style="width: 50px; height: 50px">`;
@@ -143,23 +145,25 @@ async function initMap() {
             const meetupMarkerContent = meetupMarker.content;
             meetupMarkerContent.innerHTML = `<img src="/images/meetuppoint.png" style="width: 35px; height: 50px">`;
             meetupMarkerContent.style.transform = 'rotate(0deg)';
-            meetupMarkerContent.style.transform = 'translateY(25px)';
 
             console.log(user1Marker.position);
             
             map.setCenter(user1Marker.position);
 
 
-            //watchposition function with extra parameters
+            //Watchposition function with extra parameters
             function success(position) {
               console.log("Success: location watchposition changed");
 
-              //previous position is the current value for usermarker position
+              //Previous position is the current value for usermarker position
               const prevPos = user1Marker.position
               
-              //here we update usermarker position to current geolocation position
+              //Here we update usermarker position to current geolocation position
               user1Marker.position = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
               console.log("Current position", position.coords.latitude, position.coords.longitude);
+
+              //Move down 25px so that center of the img is the anchor of the element
+              marker1Content.style.transform = 'translateY(25px)';
 
               const angle = getDirection(prevPos, user1Marker.position);
               console.log("Angle: ", angle);
@@ -495,6 +499,26 @@ function initStartButton() {
       document.getElementById('themButton').classList.add('themMoveUp')
 
       //zoom one time after the map is idle
+      google.maps.event.addListenerOnce(map, 'idle', function() {
+        map.setZoom(20);
+        map.setTilt(70);
+      });
+    }
+  })
+}
+
+// Function to initialise the them button that centers view on the user 2 position marker
+function initThemButton() {
+
+  const themButton = document.getElementById('themButton');
+  themButton.addEventListener('click', function() {
+
+    if (user2Marker.position != null) {
+
+      pannedOut = false;
+      map.panTo(user2Marker.position);
+
+      //Zoom one time after the map is idle
       google.maps.event.addListenerOnce(map, 'idle', function() {
         map.setZoom(20);
         map.setTilt(70);
