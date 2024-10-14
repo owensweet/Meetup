@@ -32,7 +32,7 @@
       </div>
     </form>
 
-    <input id="them" placeholder="Their Location">
+    <input id="them" placeholder="Type an address here">
 
     <form id="themTravelMode">
       <div class="travelModeImg">
@@ -65,9 +65,17 @@
 
 <div id="map"></div>
 
-<div id="centerButton"></div>
+<div id="centerButton">
+  <img src="/images/centerButton.png">
+</div>
 
-<div id="meetupButton"></div>
+<div id="meetupButton">
+  <img src="/images/meetupButton.png">
+</div>
+
+<div id="themButton">
+  <img src="/images/themButton.png">
+</div>
 
 <style>
     body {
@@ -77,6 +85,12 @@
       font-style: normal;
       height: 100vh;
       overflow-y: scroll;
+      display: grid;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      grid-template-rows: 35% 65%;
+      grid-template-columns: 100%;
     }
     ::placeholder {
       color: white;
@@ -98,6 +112,7 @@
       font-weight: 500;
     }
     #map {
+      grid-row: 2;
       height: 68vh;
       width: 100%;
       z-index: 1;
@@ -139,25 +154,62 @@
     }
 
     #centerButton {
-      width: 70px;
-      height: 70px;
-      background-color: purple;
+      width: 60px;
+      height: 60px;
+      background-color: #8F00FF;
       border-radius: 50%;
       z-index: 1000;
       position: absolute;
       bottom: 10px;
       right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
     }
     #meetupButton {
-      width: 70px;
-      height: 70px;
-      background-color: #8a2cb9;
+      width: 60px;
+      height: 60px;
+      background-color: #8F00FF;
       border-radius: 50%;
-      z-index: 1000;
-      position: absolute;
-      bottom:90px;
-      right: 10px;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.5s ease-in-out;
+      grid-row: 2;
+      margin-left: auto;
+      margin-top: auto;
+      margin-bottom: 10px;
+      margin-right: 10px;
+    }
+    #themButton {
+      width: 60px;
+      height: 60px;
+      background-color: #8F00FF;
+      border-radius: 50%;
+      z-index: 998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.5s ease-in-out;
+      margin-left: auto;
+      margin-top: auto;
+      margin-bottom: 10px;
+      margin-right: 10px;
+    }
+    #centerButton img, #meetupButton img, #themButton img {
+      width: 65%;
+    }
+    #meetupButton img {
+      width: 50%;
+    }
+
+    .meetupMoveUp {
+      transform: translateY(-70px); 
+    }
+    .themMoveUp {
+      transform: translateY(-140px);
     }
     #directions {
       color: white;

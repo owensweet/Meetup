@@ -92,7 +92,8 @@ async function initMap() {
       polylineOptions: { stroke: 0},
     })
 
-    initCenterButton()
+    initCenterButton();
+    initStartButton();
 
 
     // Try HTML5 geolocation.
@@ -478,7 +479,7 @@ async function getDuration(start, end, travelMode, func) {
 }
 
 //Attaching event listener to the start button to start the route
-function initCenterButton() {
+function initStartButton() {
   const startButton = document.getElementById("startButton");
   startButton.addEventListener('click', function() {
 
@@ -486,6 +487,9 @@ function initCenterButton() {
       google.maps.event.removeListener(listener);
       pannedOut = false;
       map.panTo(user1Marker.position);
+
+      document.getElementById('meetupButton').classList.add('meetupMoveUp');
+      document.getElementById('themButton').classList.add('themMoveUp')
 
       //zoom one time after the map is idle
       google.maps.event.addListenerOnce(map, 'idle', function() {
