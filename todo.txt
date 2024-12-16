@@ -1,0 +1,7 @@
+TODO:
+
+-fix user1 cycling button changing the map style (S)
+-fix horizontal scrolling on iphone (S)
+-fix the camera locking bug after starting a route (S)
+-possibly add an authentication and user system (L)
+
