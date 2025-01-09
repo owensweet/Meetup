@@ -53,7 +53,8 @@ async function initMap() {
     geocoder = new google.maps.Geocoder();
 
     directionsService = new google.maps.DirectionsService({
-      preserveViewport: true
+      preserveViewport: true,
+      suppressBicyclingLayer: true
     });
 
     distanceService = new google.maps.DistanceMatrixService({
@@ -78,18 +79,21 @@ async function initMap() {
       map: map,
       suppressMarkers: true,
       polylineOptions: { strokeColor: "purple", strokeWeight: 6},
-      preserveViewport: true
+      preserveViewport: true,
+      suppressBicyclingLayer: true
     });
     directionsRenderer2 = new google.maps.DirectionsRenderer({
       map: map,
       suppressMarkers: true,
       polylineOptions: { strokeColor: "black"}, //try hex w singe quote and declare strokWeight to 6 and opacity
-      preserveViewport: true
+      preserveViewport: true,
+      suppressBicyclingLayer: true
     })
     meetupRenderer = new google.maps.DirectionsRenderer({
       map: map,
       suppressMarkers: true,
       polylineOptions: { stroke: 0},
+      suppressBicyclingLayer: true
     })
 
     initCenterButton();
@@ -404,7 +408,7 @@ function initInput() {
   });
 }
 
-//checking the user 2 travel mode
+//checking the user 1 travel mode
 function checkMyTravelMode() {
   var mymode;
   document.querySelectorAll('input[name="meTravel"]').forEach(radio => {
@@ -415,7 +419,7 @@ function checkMyTravelMode() {
   return mymode;
 }
 
-//checking the user 1 travel mode
+//checking the user 2 travel mode
 function checkTheirTravelMode() {
   var theirmode;
   document.querySelectorAll('input[name="themTravel"]').forEach(radio => {
@@ -423,6 +427,7 @@ function checkTheirTravelMode() {
       theirmode = radio.value;
     }
   })
+  map.setMapId("25b1316f79a00934");
   return theirmode;
 }
 
